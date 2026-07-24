@@ -41,16 +41,21 @@ useRevealOnScroll(rootRef, { stagger: 80 })
   padding-block: clamp(3.5rem, 10vh, 6rem);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-lg);
 }
 
 h2 {
   max-width: 26ch;
+  margin-inline: auto;
+  text-align: center;
 }
 
 .lead {
   font-size: 1.02rem;
-  max-width: 58ch;
+  width: min(100%, 58ch);
+  margin-inline: auto;
+  text-align: left;
 }
 
 .list {
@@ -59,6 +64,8 @@ h2 {
   flex-direction: column;
   gap: var(--space-sm);
   margin-top: var(--space-sm);
+  width: min(100%, 760px);
+  text-align: left;
 }
 
 .item {
@@ -99,11 +106,13 @@ h2 {
 
 .closing {
   margin-top: var(--space-sm);
-  max-width: 48ch;
+  width: min(100%, 48ch);
   font-size: clamp(1.05rem, 2.2vw, 1.3rem);
   font-weight: 700;
   line-height: 1.7;
   color: var(--color-text);
+  margin-inline: auto;
+  text-align: left;
 }
 
 .closing span {

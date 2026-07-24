@@ -2,7 +2,6 @@
 // Tunta Expo — Screen 6: where the project actually stands. Engineering
 // voice, not an apology. The status line is deliberately understated.
 import { computed, ref } from 'vue'
-import { links } from '../content'
 import { useI18n } from '../composables/useI18n'
 import { useRevealOnScroll } from '../composables/useRevealOnScroll'
 
@@ -26,11 +25,6 @@ useRevealOnScroll(rootRef, { stagger: 110 })
       {{ paragraph }}
     </p>
     <p class="status-line reveal">{{ copy.statusLine }}</p>
-    <div class="cta-row reveal">
-      <a class="btn" :href="links.contract" target="_blank" rel="noopener noreferrer">
-        {{ copy.cta }}
-      </a>
-    </div>
   </section>
 </template>
 
@@ -39,16 +33,20 @@ useRevealOnScroll(rootRef, { stagger: 110 })
   padding-block: clamp(3.5rem, 10vh, 6rem);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-lg);
 }
 
 h2 {
   max-width: 22ch;
+  margin-inline: auto;
+  text-align: center;
 }
 
 .body {
   font-size: 1.02rem;
-  max-width: 60ch;
+  width: min(100%, 60ch);
+  text-align: left;
 }
 
 .status-line {
@@ -57,28 +55,8 @@ h2 {
   padding: var(--space-md) var(--space-lg);
   border-radius: var(--border-radius);
   background: color-mix(in srgb, var(--brand-nebula) 30%, transparent);
-  max-width: 52ch;
-}
-
-.cta-row {
-  margin-top: var(--space-xs);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.7em 1.5em;
-  border-radius: 999px;
-  font-weight: 600;
-  border: 1.5px solid var(--color-primary);
-  color: var(--color-primary);
-  transition: transform var(--transition-fast), background var(--transition-fast),
-    color var(--transition-fast);
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-  background: var(--color-primary);
-  color: var(--brand-seashell);
+  width: min(100%, 52ch);
+  margin-inline: auto;
+  text-align: left;
 }
 </style>

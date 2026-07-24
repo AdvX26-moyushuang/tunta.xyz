@@ -64,11 +64,13 @@ useRevealOnScroll(rootRef, { stagger: 130 })
   padding-block: clamp(3.5rem, 10vh, 6rem);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-xl);
 }
 
 h2 {
   max-width: 24ch;
+  text-align: center;
 }
 
 .panels {
@@ -77,6 +79,7 @@ h2 {
   gap: var(--space-lg);
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   align-items: start;
+  width: 100%;
 }
 
 /* Arrows between panels on wide screens; they collapse on narrow ones. */
@@ -85,6 +88,7 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+  text-align: left;
 }
 
 .panel + .panel::before {
@@ -116,7 +120,7 @@ h2 {
 }
 
 .panel h3 {
-  font-size: 1.15rem;
+  font-size: 2.3rem;
 }
 
 .question {
@@ -159,7 +163,7 @@ h2 {
 }
 
 .card h4 {
-  font-size: 1rem;
+  font-size: 2rem;
   line-height: 1.45;
   color: var(--color-text);
 }
@@ -195,12 +199,16 @@ h2 {
 }
 
 .closing {
-  max-width: 46ch;
+  width: min(100%, 46ch);
   font-size: clamp(1.05rem, 2.2vw, 1.3rem);
   font-weight: 700;
   line-height: 1.5;
   color: var(--color-text);
-  padding-left: var(--space-md);
-  border-left: 4px solid var(--color-primary);
+  margin-inline: auto;
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid color-mix(in srgb, var(--brand-copper) 16%, var(--brand-seashell));
+  border-radius: var(--border-radius-lg);
+  background: color-mix(in srgb, var(--brand-butter) 24%, transparent);
+  text-align: left;
 }
 </style>

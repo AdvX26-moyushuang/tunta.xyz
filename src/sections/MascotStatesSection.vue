@@ -47,16 +47,21 @@ useRevealOnScroll(rootRef, { stagger: 90 })
   padding-block: clamp(3.5rem, 10vh, 6rem);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-lg);
 }
 
 h2 {
   max-width: 20ch;
+  margin-inline: auto;
+  text-align: center;
 }
 
 .body {
   font-size: 1.02rem;
-  max-width: 58ch;
+  width: min(100%, 58ch);
+  margin-inline: auto;
+  text-align: left;
 }
 
 .states {
@@ -65,21 +70,23 @@ h2 {
   display: grid;
   gap: var(--space-lg);
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 168px), 1fr));
+  width: 100%;
 }
 
 .state {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: var(--space-xs);
   padding: var(--space-md);
   border-radius: var(--border-radius-lg);
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
-  text-align: center;
+  text-align: left;
 }
 
 .state img {
+  align-self: center;
   width: clamp(72px, 12vmin, 104px);
   height: auto;
   filter: drop-shadow(0 8px 14px color-mix(in srgb, var(--brand-copper) 18%, transparent));
@@ -89,12 +96,14 @@ h2 {
   font-weight: 700;
   color: var(--color-text);
   max-width: none;
+  width: 100%;
 }
 
 .desc {
   font-size: 0.84rem;
   color: var(--color-text-muted);
   max-width: none;
+  width: 100%;
   line-height: 1.5;
 }
 
@@ -109,6 +118,8 @@ h2 {
   font-size: clamp(1.05rem, 2.2vw, 1.3rem);
   font-weight: 700;
   color: var(--color-text);
-  max-width: 40ch;
+  width: min(100%, 40ch);
+  margin-inline: auto;
+  text-align: left;
 }
 </style>
