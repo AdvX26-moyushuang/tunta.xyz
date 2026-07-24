@@ -6,9 +6,9 @@ import { animate } from 'animejs'
 import { nextTick, ref, watch } from 'vue'
 import { introPose } from '../config/mascot'
 import LoadingScreen from '../components/LoadingScreen.vue'
+import TopNav from '../components/TopNav.vue'
 import { useI18n } from '../composables/useI18n'
 import { usePrefersReducedMotion } from '../composables/usePrefersReducedMotion'
-import FeaturesSection from '../sections/FeaturesSection.vue'
 import HeroPlayground from '../sections/HeroPlayground.vue'
 import IntroSection from '../sections/IntroSection.vue'
 import MascotStatesSection from '../sections/MascotStatesSection.vue'
@@ -19,7 +19,7 @@ import RetrievalSection from '../sections/RetrievalSection.vue'
 
 type Phase = 'loading' | 'play' | 'leaving' | 'entered'
 
-const { t, lang, toggleLang } = useI18n()
+const { t } = useI18n()
 const { prefersReducedMotion } = usePrefersReducedMotion()
 
 // `?skip-intro` lands straight on the page content, skipping the loading
@@ -110,26 +110,16 @@ async function onAbsorbed(): Promise<void> {
     draggable="false"
   />
 
-  <button
-    v-if="phase !== 'loading'"
-    type="button"
-    class="lang-toggle"
-    :aria-label="lang === 'zh' ? 'Switch to English' : '切换到中文'"
-    @click="toggleLang"
-  >
-    {{ lang === 'zh' ? 'EN' : '中' }}
-  </button>
+  <TopNav v-if="phase === 'entered'" />
 
   <main v-if="phase === 'leaving' || phase === 'entered'" id="app" class="site-main">
-    <!-- Screens 1–6 of the deck. Each section renders only if the current
-         language has copy for it, so zh and en can differ in length. -->
+    <!-- Screens 1–6 of the deck. -->
     <IntroSection ref="introRef" :landed="phase === 'entered'" />
     <ProblemSection />
     <RetrievalSection />
     <MascotStatesSection />
     <RefusalsSection />
     <ProgressSection />
-    <FeaturesSection />
     <footer class="site-footer container">
       <p class="footer-text">{{ t.footer.text }}</p>
       <p class="footer-note">{{ t.footer.note }}</p>
@@ -149,7 +139,9 @@ async function onAbsorbed(): Promise<void> {
   padding-block: var(--space-2xl);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-xs);
+  text-align: center;
 }
 
 .footer-text {
@@ -169,25 +161,4 @@ async function onAbsorbed(): Promise<void> {
   filter: drop-shadow(0 12px 20px rgb(74 50 38 / 0.25));
 }
 
-.lang-toggle {
-  position: fixed;
-  top: max(14px, env(safe-area-inset-top));
-  right: 16px;
-  z-index: 60;
-  padding: 7px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
-  color: var(--color-text-secondary);
-  font-weight: 700;
-  font-size: 0.82rem;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgb(15 23 42 / 0.1);
-  transition: color var(--transition-fast), transform var(--transition-fast);
-}
-
-.lang-toggle:hover {
-  color: var(--color-text);
-  transform: translateY(-1px);
-}
 </style>

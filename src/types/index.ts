@@ -19,16 +19,6 @@ export interface TimelineItem {
   status: 'completed' | 'in-progress' | 'planned'
 }
 
-export type Lang = 'zh' | 'en'
-
-export type FeatureIcon = 'capture' | 'review' | 'recall'
-
-export interface FeatureCard {
-  icon: FeatureIcon
-  title: string
-  description: string
-}
-
 /** The five pipeline states the mascot makes visible (deck screen 4). */
 export type MascotStateKey = 'idle' | 'fetching' | 'parsing' | 'done' | 'failed'
 
@@ -50,11 +40,7 @@ export interface RefusalItem {
   detail: string
 }
 
-/**
- * Screens 2–6 of the pitch deck. Optional on SiteContent so a language can
- * be translated one screen at a time — sections render only what exists,
- * instead of falling back to another language's copy.
- */
+/** Screens 2–6 of the pitch deck. */
 export interface DeckContent {
   problem: {
     heading: string
@@ -90,11 +76,17 @@ export interface DeckContent {
     heading: string
     paragraphs: string[]
     statusLine: string
-    cta: string
   }
 }
 
-export interface SiteContent extends Partial<DeckContent> {
+export interface SiteContent extends DeckContent {
+  nav: {
+    ariaLabel: string
+    brand: string
+    walkthrough: string
+    status: string
+    repository: string
+  }
   loading: {
     title: string
     hint: string
@@ -114,15 +106,6 @@ export interface SiteContent extends Partial<DeckContent> {
     description: string
     /** Third line under the sub-headline (deck screen 1). Optional. */
     note?: string
-    primaryCta: string
-    secondaryCta: string
-  }
-  /** The old three-card workflow screen. Superseded by `retrieval` in zh. */
-  features?: {
-    heading: string
-    items: FeatureCard[]
-    statusLabel: string
-    status: string
   }
   footer: {
     text: string

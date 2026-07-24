@@ -4,7 +4,6 @@ import { animate, stagger } from 'animejs'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import logoUrl from '../assets/logo3.png'
 import { pipelineStatePose } from '../config/mascot'
-import { links } from '../content'
 import { useI18n } from '../composables/useI18n'
 import { usePrefersReducedMotion } from '../composables/usePrefersReducedMotion'
 import type { MascotStateKey } from '../types'
@@ -24,10 +23,6 @@ const FRAME_MS = 2000
 
 const { t } = useI18n()
 const { prefersReducedMotion } = usePrefersReducedMotion()
-
-// zh scrolls to the retrieval walkthrough (screen 3); en still has the old
-// three-card features screen as its first stop.
-const primaryHref = computed(() => (t.value.retrieval ? '#retrieval' : '#features'))
 
 const rootRef = ref<HTMLElement>()
 const slotRef = ref<HTMLElement>()
@@ -122,33 +117,31 @@ onMounted(() => {
     </div>
     <p class="description reveal">{{ t.intro.description }}</p>
     <p v-if="t.intro.note" class="note reveal">{{ t.intro.note }}</p>
-    <div class="cta-row reveal">
-      <a class="btn primary" :href="primaryHref">{{ t.intro.primaryCta }}</a>
-      <a class="btn ghost" :href="links.contract" target="_blank" rel="noopener noreferrer">
-        {{ t.intro.secondaryCta }}
-      </a>
-    </div>
   </section>
 </template>
 
 <style scoped>
 .intro {
-  padding-top: clamp(4rem, 12vh, 7.5rem);
+  min-height: 100svh;
+  padding-block: clamp(7rem, 15vh, 9rem) clamp(4.5rem, 10vh, 7rem);
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.25rem, 2.8vh, 2.25rem);
 }
 
 .title-row {
   display: flex;
   align-items: center;
-  gap: var(--space-lg);
+  justify-content: center;
+  gap: clamp(1rem, 2.5vw, 2rem);
 }
 
 .mascot-slot {
   flex: none;
   position: relative;
-  width: clamp(64px, 10vmin, 92px);
+  width: clamp(128px, 20vmin, 184px);
   aspect-ratio: 1;
   padding: 0;
   border: 0;
@@ -192,7 +185,8 @@ onMounted(() => {
 .title-text {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  align-items: center;
+  gap: clamp(0.25rem, 1vh, 0.75rem);
 }
 
 .brand-title {
@@ -219,60 +213,22 @@ onMounted(() => {
   font-size: clamp(1.05rem, 2.4vw, 1.5rem);
   font-weight: 600;
   color: var(--color-primary);
+  text-align: center;
 }
 
 .description {
   font-size: 1.05rem;
+  width: min(100%, 60ch);
+  margin-inline: auto;
+  text-align: left;
 }
 
-/* Third line — sits tight under the sub-headline, deliberately quiet. */
 .note {
-  margin-top: calc(var(--space-lg) * -0.55);
   font-size: 0.9rem;
   color: var(--color-text-muted);
-  max-width: 48ch;
+  width: min(100%, 48ch);
+  margin-inline: auto;
+  text-align: left;
 }
 
-.cta-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-md);
-  margin-top: var(--space-sm);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.7em 1.5em;
-  border-radius: 999px;
-  font-weight: 600;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
-    background var(--transition-fast);
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.btn.primary {
-  background: var(--color-primary);
-  color: #fff;
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--brand-copper) 32%, transparent);
-}
-
-.btn.primary:hover {
-  background: var(--color-primary-dark);
-  color: #fff;
-}
-
-.btn.ghost {
-  border: 1.5px solid var(--color-border);
-  color: var(--color-text-secondary);
-  background: transparent;
-}
-
-.btn.ghost:hover {
-  color: var(--color-text);
-  border-color: var(--color-text-muted);
-}
 </style>

@@ -29,19 +29,26 @@ useRevealOnScroll(rootRef, { stagger: 120 })
 
 <style scoped>
 .problem {
-  padding-block: clamp(3.5rem, 10vh, 6rem);
+  min-height: 100svh;
+  padding-block: clamp(6rem, 12vh, 9rem);
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.5rem, 3.5vh, 3rem);
 }
 
 h2 {
   max-width: 22ch;
+  margin-inline: auto;
+  text-align: center;
 }
 
 .body {
   font-size: 1.02rem;
-  max-width: 58ch;
+  width: min(100%, 58ch);
+  margin-inline: auto;
+  text-align: left;
 }
 
 /* The takeaway sits on a butter-yellow underline instead of a bold run.
@@ -49,11 +56,13 @@ h2 {
    blockified, so it would stretch the highlight past the end of the text. */
 .closing {
   margin-top: var(--space-sm);
-  max-width: 52ch;
+  width: min(100%, 52ch);
   font-size: clamp(1.05rem, 2.2vw, 1.3rem);
   font-weight: 700;
   line-height: 1.7;
   color: var(--color-text);
+  margin-inline: auto;
+  text-align: left;
 }
 
 .closing span {
