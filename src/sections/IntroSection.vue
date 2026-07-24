@@ -2,6 +2,7 @@
 // Tunta Expo — Intro section: product title with the mascot landing slot.
 import { animate, stagger } from 'animejs'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import logoUrl from '../assets/logo3.png'
 import { pipelineStatePose } from '../config/mascot'
 import { links } from '../content'
 import { useI18n } from '../composables/useI18n'
@@ -113,7 +114,9 @@ onMounted(() => {
         </Transition>
       </button>
       <div class="title-text">
-        <h1 class="reveal">{{ t.intro.title }}</h1>
+        <h1 class="brand-title reveal" :aria-label="t.intro.title">
+          <img :src="logoUrl" alt="" aria-hidden="true" draggable="false" />
+        </h1>
         <p class="tagline reveal">{{ t.intro.tagline }}</p>
       </div>
     </div>
@@ -192,9 +195,24 @@ onMounted(() => {
   gap: var(--space-xs);
 }
 
-.title-text h1 {
-  font-weight: 800;
-  letter-spacing: -0.02em;
+.brand-title {
+  position: relative;
+  flex: none;
+  width: clamp(10.5rem, 29vw, 20rem);
+  aspect-ratio: 3414 / 2410;
+  overflow: hidden;
+}
+
+/* logo3.png is a square source file with a transparent presentation canvas.
+   These values map its alpha bounds (x 632, y 940, 3414 × 2410) onto this
+   viewport without modifying or stretching the brand artwork. */
+.brand-title img {
+  position: absolute;
+  left: -18.51%;
+  top: -39%;
+  width: 127.47%;
+  height: 180.58%;
+  max-width: none;
 }
 
 .tagline {

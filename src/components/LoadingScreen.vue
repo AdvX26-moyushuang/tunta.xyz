@@ -2,6 +2,7 @@
 // Tunta Expo — Loading screen: mascot intro + asset preloading + progress bar
 import { animate, createTimeline, stagger } from 'animejs'
 import { computed, onMounted, ref, watch } from 'vue'
+import logoUrl from '../assets/logo3.png'
 import { introPose } from '../config/mascot'
 import photoArticle from '../assets/photo-article.png'
 import photoLink from '../assets/photo-link.png'
@@ -38,6 +39,7 @@ const PRELOAD_URLS = [
   introPose.absorbing,
   introPose.fed,
   introPose.flying,
+  logoUrl,
 ]
 // `?debug-loading` slows the intro down, handy for demos and visual QA.
 const DEBUG_SLOW =
