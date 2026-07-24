@@ -38,6 +38,7 @@ export interface SiteContent {
     mascotAlt: string
     dragHint: string
     clickHint: string
+    summonHint: string
     scrollHint: string
     gyroHint: string
     captions: string[]

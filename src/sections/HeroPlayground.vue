@@ -5,10 +5,6 @@
 import { animate } from 'animejs'
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import heroUrl from '../assets/hero.png'
-import photoArticle from '../assets/photo-article.png'
-import photoLink from '../assets/photo-link.png'
-import photoStar from '../assets/photo-star.png'
-import photoVideo from '../assets/photo-video.png'
 import { useI18n } from '../composables/useI18n'
 import {
   createPhysicsPlayground,
@@ -16,6 +12,13 @@ import {
   type PlaygroundItemSpec,
   type TrackedItem,
 } from '../composables/usePhysicsPlayground'
+import {
+  buildInitialSpecs,
+  buildSummonSpecs,
+  itemMaterial,
+  playgroundTune,
+  type SpecBuildContext,
+} from '../config/playground'
 
 const props = defineProps<{
   active: boolean
@@ -42,56 +45,22 @@ let started = false
 let absorbing = false
 let floatAnimation: { pause: () => void } | null = null
 
-// ---- Item specs ----------------------------------------------------
+// ---- Item specs (catalog lives in src/config/playground.ts) ------------
 
-const PALETTE: Array<{ color: string; edge: string }> = [
-  { color: '#f6c177', edge: '#cf8f3a' },
-  { color: '#93c5fd', edge: '#5588dd' },
-  { color: '#a7f3d0', edge: '#4fb98a' },
-  { color: '#fda4af', edge: '#de6375' },
-  { color: '#c4b5fd', edge: '#8a6fe0' },
-  { color: '#fcd34d', edge: '#d9a011' },
-  { color: '#fdba74', edge: '#d98236' },
-  { color: '#99e9f2', edge: '#45b3c3' },
-]
-const PHOTO_URLS = [photoVideo, photoArticle, photoLink, photoStar]
+let idCounter = 0
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, value))
+function nextId(): number {
+  return idCounter++
 }
 
-function buildSpecs(width: number, height: number): PlaygroundItemSpec[] {
-  const result: PlaygroundItemSpec[] = []
-  const base = clamp(Math.min(width, height) / 13, 30, 56)
-  const captions = t.value.hero.captions
-
-  PHOTO_URLS.forEach((image, i) => {
-    const size = base * (1.75 + Math.random() * 0.25)
-    result.push({
-      id: i,
-      kind: 'photo',
-      w: size,
-      h: size * 1.16,
-      image,
-      caption: captions[i] ?? '',
-    })
-  })
-
-  const boxCount = clamp(Math.round((width * height) / 46000), 8, 13)
-  for (let i = 0; i < boxCount; i += 1) {
-    const size = base * (0.8 + Math.random() * 1.0)
-    const swatch = PALETTE[Math.floor(Math.random() * PALETTE.length)]
-    result.push({
-      id: PHOTO_URLS.length + i,
-      kind: 'box',
-      w: size * (0.9 + Math.random() * 0.4),
-      h: size * (0.7 + Math.random() * 0.32),
-      color: swatch?.color,
-      edge: swatch?.edge,
-      face: Math.random() < 0.5,
-    })
+function makeCtx(): SpecBuildContext {
+  const container = containerRef.value
+  return {
+    width: container?.clientWidth ?? window.innerWidth,
+    height: container?.clientHeight ?? window.innerHeight,
+    captions: t.value.hero.captions,
+    nextId,
   }
-  return result
 }
 
 // ---- DOM sync ------------------------------------------------------
@@ -121,8 +90,8 @@ function itemStyle(spec: PlaygroundItemSpec): Record<string, string> {
     transform: 'translate3d(-9999px, -9999px, 0)',
   }
   if (spec.kind === 'box') {
-    style.background = spec.color ?? PALETTE[0]?.color ?? '#f6c177'
-    style.borderColor = spec.edge ?? PALETTE[0]?.edge ?? '#cf8f3a'
+    style.background = spec.color ?? '#f6c177'
+    style.borderColor = spec.edge ?? '#cf8f3a'
   }
   return style
 }
@@ -181,6 +150,47 @@ function detachScrollTriggers(): void {
   window.removeEventListener('wheel', onWheel)
   window.removeEventListener('touchstart', onTouchStart)
   window.removeEventListener('touchmove', onTouchMove)
+}
+
+// ---- Blank-click summon --------------------------------------------
+
+interface Ripple {
+  id: number
+  x: number
+  y: number
+}
+
+const ripples = ref<Ripple[]>([])
+let rippleCounter = 0
+
+function spawnRipple(x: number, y: number): void {
+  const id = rippleCounter++
+  ripples.value.push({ id, x, y })
+  window.setTimeout(() => {
+    ripples.value = ripples.value.filter((ripple) => ripple.id !== id)
+  }, 520)
+}
+
+async function onBlankClick(event: MouseEvent): Promise<void> {
+  if (!controller || !started || absorbing) return
+  const target = event.target instanceof HTMLElement ? event.target : null
+  // Clicks starting on an item are drags; the mascot has its own handler.
+  if (target?.closest('.playground-item') || target?.closest('.mascot-button')) return
+  const container = containerRef.value
+  if (!container) return
+  const remaining = playgroundTune.maxItems - specs.value.length
+  if (remaining <= 0) return
+
+  const rect = container.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+  spawnRipple(x, y)
+
+  const batch = buildSummonSpecs(makeCtx()).slice(0, remaining)
+  specs.value = [...specs.value, ...batch]
+  // Wait for the new elements to mount, then drop bodies for them.
+  await nextTick()
+  controller.add(batch, { x, spread: playgroundTune.summonSpread })
 }
 
 // ---- Absorb → burst sequence ----------------------------------------
@@ -284,7 +294,7 @@ watch(
 onMounted(async () => {
   const container = containerRef.value
   if (!container) return
-  specs.value = buildSpecs(container.clientWidth, container.clientHeight)
+  specs.value = buildInitialSpecs(makeCtx())
   await nextTick()
   controller = createPhysicsPlayground({
     container,
@@ -293,6 +303,7 @@ onMounted(async () => {
     onTiltActive: () => {
       tiltOn.value = true
     },
+    material: itemMaterial,
   })
   window.addEventListener('resize', onResize)
   if (props.active) startPlay()
@@ -313,7 +324,15 @@ onBeforeUnmount(() => {
     class="hero-playground"
     :class="{ leaving: mascotHidden }"
     aria-label="Tunta playground"
+    @click="onBlankClick"
   >
+    <span
+      v-for="ripple in ripples"
+      :key="ripple.id"
+      class="summon-ripple"
+      :style="{ left: ripple.x + 'px', top: ripple.y + 'px' }"
+      aria-hidden="true"
+    ></span>
     <div
       v-for="spec in specs"
       :key="spec.id"
@@ -348,6 +367,7 @@ onBeforeUnmount(() => {
 
     <div class="hero-hint hint-main">
       <span>{{ t.hero.dragHint }}</span>
+      <span class="summon-line">{{ t.hero.summonHint }}</span>
       <strong>{{ t.hero.clickHint }}</strong>
     </div>
     <div class="hero-hint hint-scroll" aria-hidden="true">
@@ -543,6 +563,35 @@ onBeforeUnmount(() => {
   text-align: center;
   color: #96704f;
   pointer-events: none;
+  text-shadow: 0 1px 10px #fdeed8, 0 0 4px #fdeed8;
+}
+
+.summon-line {
+  font-size: 0.86em;
+  color: #b08a63;
+}
+
+.summon-ripple {
+  position: absolute;
+  z-index: 8;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 3px solid #e98b4e;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ripple 480ms ease-out forwards;
+}
+
+@keyframes ripple {
+  from {
+    opacity: 0.85;
+    scale: 0.4;
+  }
+  to {
+    opacity: 0;
+    scale: 3.4;
+  }
 }
 
 .hint-main {

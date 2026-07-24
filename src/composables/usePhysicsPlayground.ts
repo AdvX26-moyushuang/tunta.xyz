@@ -31,11 +31,37 @@ export interface TrackedItem {
   body: Matter.Body
 }
 
+export interface PhysicsMaterial {
+  restitution: number
+  friction: number
+  frictionAir: number
+  density: number
+  /** Rounded-corner radius (px), capped per item by its size. */
+  chamferRadius: number
+}
+
+const DEFAULT_MATERIAL: PhysicsMaterial = {
+  restitution: 0.34,
+  friction: 0.42,
+  frictionAir: 0.012,
+  density: 0.0012,
+  chamferRadius: 10,
+}
+
+export interface AddItemsOrigin {
+  /** Horizontal center (container coords) for the new batch. */
+  x: number
+  /** Horizontal scatter radius around `x` in px. */
+  spread?: number
+}
+
 export interface PhysicsController {
   /** Items with live visual states (mutated by physics / anime.js). */
   readonly items: TrackedItem[]
   /** Spawn bodies, start the loop, enable mouse drag + tilt. Idempotent. */
   start: () => void
+  /** Drop extra items from above while the world is running. */
+  add: (specs: PlaygroundItemSpec[], origin?: AddItemsOrigin) => void
   /** Freeze physics and detach all bodies; visual states stay put. */
   detach: () => TrackedItem[]
   /** Rebuild boundary walls after a container resize. */
@@ -49,10 +75,14 @@ export interface PhysicsPlaygroundOptions {
   specs: PlaygroundItemSpec[]
   onRender: (item: TrackedItem) => void
   onTiltActive?: () => void
+  /** Partial material overrides for every spawned body. */
+  material?: Partial<PhysicsMaterial>
 }
 
 const WALL = 140
 const STEP_MS = 1000 / 60
+/** Bodies may never rise higher than this many container heights above the top. */
+const MAX_RISE_HEIGHTS = 1
 
 function rand(min: number, max: number): number {
   return min + Math.random() * (max - min)
@@ -64,6 +94,7 @@ function clamp(value: number, min: number, max: number): number {
 
 export function createPhysicsPlayground(options: PhysicsPlaygroundOptions): PhysicsController {
   const { container, specs, onRender, onTiltActive } = options
+  const material: PhysicsMaterial = { ...DEFAULT_MATERIAL, ...options.material }
 
   const engine = Matter.Engine.create({ enableSleeping: false })
   const world = engine.world
@@ -102,28 +133,45 @@ export function createPhysicsPlayground(options: PhysicsPlaygroundOptions): Phys
     Matter.Composite.add(world, walls)
   }
 
+  function createBody(spec: PlaygroundItemSpec, x: number, y: number): Matter.Body {
+    const body = Matter.Bodies.rectangle(x, y, spec.w, spec.h, {
+      chamfer: { radius: Math.min(material.chamferRadius, spec.w * 0.12, spec.h * 0.12) },
+      restitution: material.restitution,
+      friction: material.friction,
+      frictionAir: material.frictionAir,
+      density: material.density,
+      angle: rand(-0.4, 0.4),
+    })
+    Matter.Body.setVelocity(body, { x: rand(-2.4, 2.4), y: rand(0, 2) })
+    Matter.Body.setAngularVelocity(body, rand(-0.09, 0.09))
+    return body
+  }
+
   function spawnBodies(): void {
     const w = container.clientWidth
     const bodies: Matter.Body[] = []
     items.forEach((item, index) => {
-      const { spec } = item
-      const body = Matter.Bodies.rectangle(
-        rand(w * 0.1, w * 0.9),
-        -80 - index * rand(56, 96),
-        spec.w,
-        spec.h,
-        {
-          chamfer: { radius: Math.min(10, spec.w * 0.12, spec.h * 0.12) },
-          restitution: 0.34,
-          friction: 0.42,
-          frictionAir: 0.012,
-          density: 0.0012,
-          angle: rand(-0.4, 0.4),
-        },
+      item.body = createBody(item.spec, rand(w * 0.1, w * 0.9), -80 - index * rand(56, 96))
+      bodies.push(item.body)
+    })
+    Matter.Composite.add(world, bodies)
+  }
+
+  function add(specsToAdd: PlaygroundItemSpec[], origin?: AddItemsOrigin): void {
+    if (!running || destroyed || specsToAdd.length === 0) return
+    const w = container.clientWidth
+    const spread = origin?.spread ?? 60
+    const bodies: Matter.Body[] = []
+    specsToAdd.forEach((spec, index) => {
+      const x = clamp(
+        (origin?.x ?? w / 2) + rand(-spread, spread),
+        spec.w / 2 + 8,
+        w - spec.w / 2 - 8,
       )
-      Matter.Body.setVelocity(body, { x: rand(-2.4, 2.4), y: rand(0, 2) })
-      Matter.Body.setAngularVelocity(body, rand(-0.09, 0.09))
-      item.body = body
+      const y = -60 - index * rand(48, 88)
+      const state: ItemVisualState = { x, y, angle: 0, scale: 1, opacity: 1 }
+      const body = createBody(spec, x, y)
+      items.push({ spec, state, body })
       bodies.push(body)
     })
     Matter.Composite.add(world, bodies)
@@ -203,6 +251,21 @@ export function createPhysicsPlayground(options: PhysicsPlaygroundOptions): Phys
     }
   }
 
+  // Soft ceiling at -MAX_RISE_HEIGHTS × container height. Only bodies moving
+  // upward are stopped, so the initial cascade (which spawns above the limit
+  // but falls downward) keeps its staggered timing, while flipped-gravity
+  // devices can not fling the pile away.
+  function clampRise(): void {
+    const minY = -container.clientHeight * MAX_RISE_HEIGHTS
+    for (const item of items) {
+      const body = item.body
+      if (body.position.y < minY && body.velocity.y < 0) {
+        Matter.Body.setPosition(body, { x: body.position.x, y: minY })
+        Matter.Body.setVelocity(body, { x: body.velocity.x, y: 0 })
+      }
+    }
+  }
+
   function tick(now: number): void {
     if (!running) return
     rafId = requestAnimationFrame(tick)
@@ -213,6 +276,7 @@ export function createPhysicsPlayground(options: PhysicsPlaygroundOptions): Phys
       Matter.Engine.update(engine, STEP_MS)
       accumulator -= STEP_MS
     }
+    clampRise()
     syncStates()
   }
 
@@ -266,5 +330,5 @@ export function createPhysicsPlayground(options: PhysicsPlaygroundOptions): Phys
     Matter.Engine.clear(engine)
   }
 
-  return { items, start, detach, resize, destroy }
+  return { items, start, add, detach, resize, destroy }
 }
