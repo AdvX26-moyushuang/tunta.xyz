@@ -3,3 +3,4 @@
 export * from './useI18n'
 export * from './usePrefersReducedMotion'
 export * from './usePhysicsPlayground'
+export * from './useRevealOnScroll'

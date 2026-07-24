@@ -4,20 +4,31 @@
 // flies to the title) → entered (page content, scroll unlocked).
 import { animate } from 'animejs'
 import { nextTick, ref, watch } from 'vue'
-import heroUrl from '../assets/hero.png'
+import { introPose } from '../config/mascot'
 import LoadingScreen from '../components/LoadingScreen.vue'
 import { useI18n } from '../composables/useI18n'
 import { usePrefersReducedMotion } from '../composables/usePrefersReducedMotion'
 import FeaturesSection from '../sections/FeaturesSection.vue'
 import HeroPlayground from '../sections/HeroPlayground.vue'
 import IntroSection from '../sections/IntroSection.vue'
+import MascotStatesSection from '../sections/MascotStatesSection.vue'
+import ProblemSection from '../sections/ProblemSection.vue'
+import ProgressSection from '../sections/ProgressSection.vue'
+import RefusalsSection from '../sections/RefusalsSection.vue'
+import RetrievalSection from '../sections/RetrievalSection.vue'
 
 type Phase = 'loading' | 'play' | 'leaving' | 'entered'
 
 const { t, lang, toggleLang } = useI18n()
 const { prefersReducedMotion } = usePrefersReducedMotion()
 
-const phase = ref<Phase>('loading')
+// `?skip-intro` lands straight on the page content, skipping the loading
+// screen and the playground. For demo rehearsal and visual QA, mirroring the
+// existing `?debug-loading` flag in LoadingScreen.
+const SKIP_INTRO =
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('skip-intro')
+
+const phase = ref<Phase>(SKIP_INTRO ? 'entered' : 'loading')
 const flying = ref(false)
 const flyStyle = ref<Record<string, string>>({})
 
@@ -93,7 +104,7 @@ async function onAbsorbed(): Promise<void> {
     v-if="flying"
     class="fly-mascot"
     :style="flyStyle"
-    :src="heroUrl"
+    :src="introPose.flying"
     :alt="t.hero.mascotAlt"
     aria-hidden="true"
     draggable="false"
@@ -110,7 +121,14 @@ async function onAbsorbed(): Promise<void> {
   </button>
 
   <main v-if="phase === 'leaving' || phase === 'entered'" id="app" class="site-main">
+    <!-- Screens 1–6 of the deck. Each section renders only if the current
+         language has copy for it, so zh and en can differ in length. -->
     <IntroSection ref="introRef" :landed="phase === 'entered'" />
+    <ProblemSection />
+    <RetrievalSection />
+    <MascotStatesSection />
+    <RefusalsSection />
+    <ProgressSection />
     <FeaturesSection />
     <footer class="site-footer container">
       <p class="footer-text">{{ t.footer.text }}</p>

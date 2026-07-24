@@ -1,13 +1,16 @@
 <script setup lang="ts">
 // Tunta Expo — Features section: three workflow cards + project status.
 import { animate, stagger } from 'animejs'
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import { usePrefersReducedMotion } from '../composables/usePrefersReducedMotion'
 import type { FeatureIcon } from '../types'
 
 const { t } = useI18n()
 const { prefersReducedMotion } = usePrefersReducedMotion()
+
+// Only rendered for languages that still use the three-card screen (en).
+const copy = computed(() => t.value.features)
 
 const rootRef = ref<HTMLElement>()
 let observer: IntersectionObserver | null = null
@@ -49,10 +52,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <section id="features" ref="rootRef" class="features container" aria-label="Tunta workflows">
-    <h2 class="reveal">{{ t.features.heading }}</h2>
+  <section v-if="copy" id="features" ref="rootRef" class="features container" aria-label="Tunta workflows">
+    <h2 class="reveal">{{ copy.heading }}</h2>
     <div class="cards">
-      <article v-for="item in t.features.items" :key="item.icon" class="card reveal">
+      <article v-for="item in copy.items" :key="item.icon" class="card reveal">
         <span class="icon" aria-hidden="true">
           <svg v-if="iconOf(item.icon) === 'capture'" width="26" height="26" viewBox="0 0 24 24" fill="none">
             <path
@@ -80,10 +83,10 @@ onBeforeUnmount(() => {
         <p>{{ item.description }}</p>
       </article>
     </div>
-    <p id="status" class="status reveal">
+    <p class="status reveal">
       <span class="dot" aria-hidden="true"></span>
-      <strong>{{ t.features.statusLabel }}</strong>
-      <span>{{ t.features.status }}</span>
+      <strong>{{ copy.statusLabel }}</strong>
+      <span>{{ copy.status }}</span>
     </p>
   </section>
 </template>
@@ -126,7 +129,7 @@ onBeforeUnmount(() => {
   height: 48px;
   border-radius: 14px;
   color: var(--color-primary);
-  background: rgb(99 102 241 / 0.12);
+  background: color-mix(in srgb, var(--brand-butter) 70%, transparent);
 }
 
 .card p {
@@ -140,7 +143,7 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   padding: var(--space-md) var(--space-lg);
   border-radius: var(--border-radius);
-  background: rgb(6 182 212 / 0.1);
+  background: color-mix(in srgb, var(--brand-nebula) 42%, transparent);
   color: var(--color-text-secondary);
   font-size: 0.92rem;
 }
@@ -155,6 +158,6 @@ onBeforeUnmount(() => {
   height: 9px;
   border-radius: 50%;
   background: var(--color-accent);
-  box-shadow: 0 0 0 4px rgb(6 182 212 / 0.2);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand-nebula) 55%, transparent);
 }
 </style>
