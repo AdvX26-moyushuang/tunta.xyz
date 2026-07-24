@@ -2,7 +2,7 @@
 // Tunta Expo — Loading screen: mascot intro + asset preloading + progress bar
 import { animate, createTimeline, stagger } from 'animejs'
 import { computed, onMounted, ref, watch } from 'vue'
-import heroUrl from '../assets/hero.png'
+import { introPose } from '../config/mascot'
 import photoArticle from '../assets/photo-article.png'
 import photoLink from '../assets/photo-link.png'
 import photoStar from '../assets/photo-star.png'
@@ -25,7 +25,20 @@ const progress = ref(0)
 const percent = computed(() => Math.round(progress.value * 100))
 const letters = computed(() => [...t.value.loading.title])
 
-const PRELOAD_URLS = [heroUrl, photoStar, photoVideo, photoArticle, photoLink]
+// Every pose the entry sequence swaps to is preloaded here — the absorb
+// beats change `src` instantly, and an unfetched image would flash empty.
+// Duplicates are harmless: they resolve from cache and still tick progress.
+const PRELOAD_URLS = [
+  photoStar,
+  photoVideo,
+  photoArticle,
+  photoLink,
+  introPose.loading,
+  introPose.idle,
+  introPose.absorbing,
+  introPose.fed,
+  introPose.flying,
+]
 // `?debug-loading` slows the intro down, handy for demos and visual QA.
 const DEBUG_SLOW =
   typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('debug-loading')
@@ -133,7 +146,13 @@ watch(progress, (value) => {
 <template>
   <div ref="rootRef" class="loading-screen" role="status" aria-live="polite">
     <div ref="contentRef" class="loading-content">
-      <img ref="mascotRef" class="loading-mascot" :src="heroUrl" :alt="t.hero.mascotAlt" draggable="false" />
+      <img
+        ref="mascotRef"
+        class="loading-mascot"
+        :src="introPose.loading"
+        :alt="t.hero.mascotAlt"
+        draggable="false"
+      />
       <h1 class="loading-title" aria-label="Tunta">
         <span v-for="(letter, i) in letters" :key="i" class="loading-letter">{{ letter === ' ' ? ' ' : letter }}</span>
       </h1>

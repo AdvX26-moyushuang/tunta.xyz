@@ -4,7 +4,7 @@
 // absorb → burst sequence animates the same visual-state objects with anime.js.
 import { animate } from 'animejs'
 import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
-import heroUrl from '../assets/hero.png'
+import { introPose } from '../config/mascot'
 import { useI18n } from '../composables/useI18n'
 import {
   createPhysicsPlayground,
@@ -38,6 +38,11 @@ const mascotImgRef = ref<HTMLElement>()
 
 const specs = shallowRef<PlaygroundItemSpec[]>([])
 const tiltOn = ref(false)
+
+// Which drawing the otter is wearing right now. The absorb sequence walks it
+// through idle → absorbing → fed; every pose is the same 320×320 square, so
+// the swap never nudges the layout.
+const pose = ref<string>(introPose.idle)
 
 const itemEls = new Map<number, HTMLElement>()
 let controller: PhysicsController | null = null
@@ -220,6 +225,7 @@ async function triggerAbsorb(): Promise<void> {
   animate(container.querySelectorAll('.hero-hint'), { opacity: [1, 0], duration: 220, ease: 'outQuad' })
 
   // 1) The otter opens wide…
+  pose.value = introPose.absorbing
   await animate(inner, { scale: [1, 1.16], duration: 260, ease: 'outBack' })
 
   // 2) …and everything gets sucked in.
@@ -243,7 +249,8 @@ async function triggerAbsorb(): Promise<void> {
 
 
 
-  // 4) Everything bursts back out and fades away.
+  // 4) Fed and pleased — everything bursts back out and fades away.
+  pose.value = introPose.fed
   const bursts = items.map((item) => {
     const theta = Math.random() * Math.PI * 2
     const distance = diagonal * (0.55 + Math.random() * 0.35)
@@ -361,7 +368,7 @@ onBeforeUnmount(() => {
     <div v-show="!mascotHidden" ref="mascotRef" class="mascot-wrap">
       <button type="button" class="mascot-button" :aria-label="t.hero.clickHint" @click="triggerAbsorb">
         <span ref="mascotInnerRef" class="mascot-inner">
-          <img ref="mascotImgRef" :src="heroUrl" :alt="t.hero.mascotAlt" draggable="false" />
+          <img ref="mascotImgRef" :src="pose" :alt="t.hero.mascotAlt" draggable="false" />
         </span>
       </button>
       <span class="mascot-shadow" aria-hidden="true"></span>
