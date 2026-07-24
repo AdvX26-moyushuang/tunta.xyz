@@ -241,6 +241,8 @@ async function triggerAbsorb(): Promise<void> {
   // 3) Gulp.
   await animate(inner, { scale: [1.16, 0.84, 1.06], duration: 380, ease: 'inOutQuad' })
 
+
+
   // 4) Everything bursts back out and fades away.
   const bursts = items.map((item) => {
     const theta = Math.random() * Math.PI * 2
@@ -389,8 +391,7 @@ onBeforeUnmount(() => {
   z-index: 30;
   overflow: hidden;
   touch-action: none;
-  background:
-    radial-gradient(110% 80% at 50% 0%, #fff9ee 0%, #fdeed8 55%, #f7dfc0 100%);
+  background: transparent;
   transition: opacity 480ms ease 80ms;
 }
 
