@@ -20,10 +20,12 @@ useRevealOnScroll(rootRef, { stagger: 120 })
     aria-label="Tunta problem"
   >
     <h2 class="reveal">{{ copy.heading }}</h2>
-    <p v-for="(paragraph, i) in copy.paragraphs" :key="i" class="body reveal">
-      {{ paragraph }}
-    </p>
-    <p class="closing reveal"><span>{{ copy.closing }}</span></p>
+    <div class="content">
+      <p v-for="(paragraph, i) in copy.paragraphs" :key="i" class="body reveal">
+        {{ paragraph }}
+      </p>
+      <p class="closing reveal"><span>{{ copy.closing }}</span></p>
+    </div>
   </section>
 </template>
 
@@ -31,23 +33,30 @@ useRevealOnScroll(rootRef, { stagger: 120 })
 .problem {
   min-height: 100svh;
   padding-block: clamp(6rem, 12vh, 9rem);
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.9fr) minmax(0, 1.1fr);
   align-items: center;
-  justify-content: center;
-  gap: clamp(1.5rem, 3.5vh, 3rem);
+  gap: clamp(3rem, 8vw, 7rem);
 }
 
 h2 {
-  max-width: 22ch;
+  max-width: 9ch;
   margin-inline: auto;
   text-align: center;
 }
 
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(1.5rem, 3.5vh, 3rem);
+  width: 100%;
+  max-width: 58ch;
+}
+
 .body {
   font-size: 1.02rem;
-  width: min(100%, 58ch);
-  margin-inline: auto;
+  width: 100%;
   text-align: left;
 }
 
@@ -61,7 +70,6 @@ h2 {
   font-weight: 700;
   line-height: 1.7;
   color: var(--color-text);
-  margin-inline: auto;
   text-align: left;
 }
 
@@ -72,5 +80,17 @@ h2 {
   );
   background-repeat: no-repeat;
   padding-inline: 0.1em;
+}
+
+@media (max-width: 720px) {
+  .problem {
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: clamp(3rem, 9vh, 5rem);
+  }
+
+  .content {
+    margin-inline: auto;
+  }
 }
 </style>

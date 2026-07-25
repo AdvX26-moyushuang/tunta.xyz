@@ -20,41 +20,51 @@ useRevealOnScroll(rootRef, { stagger: 80 })
     aria-label="Tunta non-goals"
   >
     <h2 class="reveal">{{ copy.heading }}</h2>
-    <p class="lead reveal">{{ copy.lead }}</p>
+    <div class="content">
+      <p class="lead reveal">{{ copy.lead }}</p>
 
-    <ul class="list">
-      <li v-for="item in copy.items" :key="item.title" class="item reveal">
-        <span class="mark" aria-hidden="true">✕</span>
-        <span class="text">
-          <strong>{{ item.title }}</strong>
-          <span class="detail">{{ item.detail }}</span>
-        </span>
-      </li>
-    </ul>
+      <ul class="list">
+        <li v-for="item in copy.items" :key="item.title" class="item reveal">
+          <span class="mark" aria-hidden="true">✕</span>
+          <span class="text">
+            <strong>{{ item.title }}</strong>
+            <span class="detail">{{ item.detail }}</span>
+          </span>
+        </li>
+      </ul>
 
-    <p class="closing reveal"><span>{{ copy.closing }}</span></p>
+      <p class="closing reveal"><span>{{ copy.closing }}</span></p>
+    </div>
   </section>
 </template>
 
 <style scoped>
 .refusals {
   padding-block: clamp(3.5rem, 10vh, 6rem);
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.9fr) minmax(0, 1.1fr);
   align-items: center;
-  gap: var(--space-lg);
+  gap: clamp(3rem, 8vw, 7rem);
 }
 
 h2 {
-  max-width: 26ch;
+  max-width: 9ch;
   margin-inline: auto;
   text-align: center;
 }
 
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-lg);
+  width: 100%;
+  max-width: 58ch;
+}
+
 .lead {
   font-size: 1.02rem;
-  width: min(100%, 58ch);
-  margin-inline: auto;
+  width: 100%;
   text-align: left;
 }
 
@@ -64,7 +74,7 @@ h2 {
   flex-direction: column;
   gap: var(--space-sm);
   margin-top: var(--space-sm);
-  width: min(100%, 760px);
+  width: 100%;
   text-align: left;
 }
 
@@ -111,7 +121,6 @@ h2 {
   font-weight: 700;
   line-height: 1.7;
   color: var(--color-text);
-  margin-inline: auto;
   text-align: left;
 }
 
@@ -122,5 +131,16 @@ h2 {
   );
   background-repeat: no-repeat;
   padding-inline: 0.1em;
+}
+
+@media (max-width: 720px) {
+  .refusals {
+    grid-template-columns: 1fr;
+    gap: clamp(3rem, 9vh, 5rem);
+  }
+
+  .content {
+    margin-inline: auto;
+  }
 }
 </style>
