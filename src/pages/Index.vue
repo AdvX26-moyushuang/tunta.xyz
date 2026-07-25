@@ -9,13 +9,17 @@ import LoadingScreen from '../components/LoadingScreen.vue'
 import TopNav from '../components/TopNav.vue'
 import { useI18n } from '../composables/useI18n'
 import { usePrefersReducedMotion } from '../composables/usePrefersReducedMotion'
+import FaqSection from '../sections/FaqSection.vue'
+import FinalCtaSection from '../sections/FinalCtaSection.vue'
 import HeroPlayground from '../sections/HeroPlayground.vue'
 import IntroSection from '../sections/IntroSection.vue'
 import MascotStatesSection from '../sections/MascotStatesSection.vue'
+import PrinciplesSection from '../sections/PrinciplesSection.vue'
 import ProblemSection from '../sections/ProblemSection.vue'
 import ProgressSection from '../sections/ProgressSection.vue'
 import RefusalsSection from '../sections/RefusalsSection.vue'
 import RetrievalSection from '../sections/RetrievalSection.vue'
+import ScopeSection from '../sections/ScopeSection.vue'
 
 type Phase = 'loading' | 'play' | 'leaving' | 'entered'
 
@@ -113,17 +117,18 @@ async function onAbsorbed(): Promise<void> {
   <TopNav v-if="phase === 'entered'" />
 
   <main v-if="phase === 'leaving' || phase === 'entered'" id="app" class="site-main">
-    <!-- Screens 1–6 of the deck. -->
+    <!-- Screens 1–10: pitch first, then the conversion layer (scope, FAQ, CTA). -->
     <IntroSection ref="introRef" :landed="phase === 'entered'" />
     <ProblemSection />
     <RetrievalSection />
+    <PrinciplesSection />
     <MascotStatesSection />
+    <ScopeSection />
     <RefusalsSection />
     <ProgressSection />
-    <footer class="site-footer container">
-      <p class="footer-text">{{ t.footer.text }}</p>
-      <p class="footer-note">{{ t.footer.note }}</p>
-    </footer>
+    <FaqSection />
+    <!-- The footer lives inside the final screen: one closing beat, not two. -->
+    <FinalCtaSection />
   </main>
 </template>
 
@@ -132,26 +137,6 @@ async function onAbsorbed(): Promise<void> {
   display: flex;
   flex-direction: column;
   flex: 1;
-}
-
-.site-footer {
-  margin-top: auto;
-  padding-block: var(--space-2xl);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-xs);
-  text-align: center;
-}
-
-.footer-text {
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.footer-note {
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
 }
 
 .fly-mascot {

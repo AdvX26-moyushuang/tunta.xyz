@@ -128,7 +128,7 @@ h2 {
   border-radius: var(--border-radius);
   border-left: 3px solid var(--color-accent);
   background: color-mix(in srgb, var(--brand-nebula) 26%, transparent);
-  font-size: 0.98rem;
+  font-size: var(--font-body);
   color: var(--color-text);
 }
 
@@ -169,7 +169,7 @@ h2 {
 }
 
 .card-body {
-  font-size: 0.9rem;
+  font-size: var(--font-body-sm);
   color: var(--color-text-secondary);
   max-width: none;
 }
@@ -193,7 +193,7 @@ h2 {
 }
 
 .verify-body {
-  font-size: 0.98rem;
+  font-size: var(--font-body);
   color: var(--color-text-secondary);
   max-width: 34ch;
 }

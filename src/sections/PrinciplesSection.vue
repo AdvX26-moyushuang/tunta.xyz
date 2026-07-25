@@ -1,37 +1,38 @@
 <script setup lang="ts">
-// Tunta Expo — Screen 5: what we said no to. Plain list, no disclaimer tone.
+// Tunta Expo — Screen 4: the three commitments. This is the differentiation
+// screen: not "AI tidies up for you", but "every answer can be traced back".
 import { computed, ref } from 'vue'
 import { useI18n } from '../composables/useI18n'
 import { useRevealOnScroll } from '../composables/useRevealOnScroll'
 
 const { t } = useI18n()
-const copy = computed(() => t.value.refusals)
+const copy = computed(() => t.value.principles)
 
 const rootRef = ref<HTMLElement>()
-useRevealOnScroll(rootRef, { stagger: 80 })
+useRevealOnScroll(rootRef, { stagger: 90 })
 </script>
 
 <template>
   <section
     v-if="copy"
-    id="refusals"
+    id="principles"
     ref="rootRef"
-    class="refusals container"
-    aria-label="Tunta non-goals"
+    class="principles container"
+    aria-label="Tunta principles"
   >
     <h2 class="reveal">{{ copy.heading }}</h2>
     <div class="content">
       <p class="lead reveal">{{ copy.lead }}</p>
 
-      <ul class="list">
-        <li v-for="item in copy.items" :key="item.title" class="item reveal">
-          <span class="mark" aria-hidden="true">✕</span>
+      <ol class="list">
+        <li v-for="(item, i) in copy.items" :key="item.title" class="item reveal">
+          <span class="index" aria-hidden="true">{{ String(i + 1).padStart(2, '0') }}</span>
           <span class="text">
             <strong>{{ item.title }}</strong>
             <span class="detail">{{ item.detail }}</span>
           </span>
         </li>
-      </ul>
+      </ol>
 
       <p class="closing reveal"><span>{{ copy.closing }}</span></p>
     </div>
@@ -39,7 +40,7 @@ useRevealOnScroll(rootRef, { stagger: 80 })
 </template>
 
 <style scoped>
-.refusals {
+.principles {
   padding-block: clamp(3.5rem, 10vh, 6rem);
   display: grid;
   grid-template-columns: minmax(16rem, 0.9fr) minmax(0, 1.1fr);
@@ -88,10 +89,14 @@ h2 {
   border: 1px solid var(--color-border);
 }
 
-.mark {
+/* Numbered rather than ticked: these are commitments in order of weight,
+   not a feature checklist. */
+.index {
   flex: none;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
   font-weight: 700;
-  color: var(--color-text-muted);
+  color: var(--color-primary);
 }
 
 .text {
@@ -102,10 +107,6 @@ h2 {
 
 .text strong {
   color: var(--color-text);
-  /* Struck through: these are the things that are not there. */
-  text-decoration: line-through;
-  text-decoration-color: color-mix(in srgb, var(--brand-copper) 45%, transparent);
-  text-decoration-thickness: 1.5px;
 }
 
 .detail {
@@ -134,7 +135,7 @@ h2 {
 }
 
 @media (max-width: 720px) {
-  .refusals {
+  .principles {
     grid-template-columns: 1fr;
     gap: clamp(3rem, 9vh, 5rem);
   }

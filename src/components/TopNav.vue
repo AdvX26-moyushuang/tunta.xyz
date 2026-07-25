@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import avatarUrl from '../assets/tunta-ip/IMG_6456.PNG'
+import avatarUrl from '../assets/icon.png'
 import { links } from '../content'
 import { useI18n } from '../composables/useI18n'
 
@@ -92,9 +92,9 @@ const { t } = useI18n()
 .brand-avatar img {
   width: 100%;
   height: 100%;
-  padding-right: 3px;
-  object-fit: contain;
-  transform: scale(2.15) translateY(19%);
+  object-fit: cover;
+  /* icon.png carries transparent padding; nudge it to fill the circle. */
+  transform: scale(1.12);
 }
 
 .divider {

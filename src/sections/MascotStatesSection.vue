@@ -48,6 +48,9 @@ useRevealOnScroll(rootRef, { stagger: 90 })
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* Without this the content stacked at the top of a 100svh screen and left a
+     dead half below it — the reason this screen read as small and flat. */
+  justify-content: center;
   gap: var(--space-lg);
 }
 
@@ -58,7 +61,7 @@ h2 {
 }
 
 .body {
-  font-size: 1.02rem;
+  font-size: var(--font-body);
   width: min(100%, 58ch);
   margin-inline: auto;
   text-align: left;
@@ -69,7 +72,7 @@ h2 {
   margin-top: var(--space-md);
   display: grid;
   gap: var(--space-lg);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 168px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   width: 100%;
 }
 
@@ -77,34 +80,37 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--space-xs);
-  padding: var(--space-md);
+  gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-md) var(--space-md);
   border-radius: var(--border-radius-lg);
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   text-align: left;
 }
 
+/* The mascot is the brand asset on this screen, so it gets real size rather
+   than a thumbnail. vw-driven so it keeps growing on a large desktop. */
 .state img {
   align-self: center;
-  width: clamp(72px, 12vmin, 104px);
+  width: clamp(88px, 9vw, 172px);
   height: auto;
-  filter: drop-shadow(0 8px 14px color-mix(in srgb, var(--brand-copper) 18%, transparent));
+  filter: drop-shadow(0 10px 18px color-mix(in srgb, var(--brand-copper) 20%, transparent));
 }
 
 .label {
   font-weight: 700;
+  font-size: var(--font-body);
   color: var(--color-text);
   max-width: none;
   width: 100%;
 }
 
 .desc {
-  font-size: 0.84rem;
+  font-size: var(--font-body-sm);
   color: var(--color-text-muted);
   max-width: none;
   width: 100%;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 /* The failure state is the point of the screen, so it gets the accent ring. */
