@@ -43,9 +43,14 @@
   --space-3xl: 4rem;
 
   /* Layout */
-  --max-width: 1080px;
+  --max-width: 1240px;
   --border-radius: 0.5rem;
   --border-radius-lg: 1rem;
+
+  /* Body copy. Fixed rem reads too small on a large desktop, so section prose
+     scales with the viewport between a 1280px and a 1728px-class display. */
+  --font-body: clamp(1.02rem, 0.28vw + 0.92rem, 1.22rem);
+  --font-body-sm: clamp(0.88rem, 0.2vw + 0.8rem, 1.02rem);
 
   /* Transitions */
   --transition-fast: 150ms ease;
@@ -100,10 +105,6 @@ body {
   min-height: 100svh;
   scroll-snap-align: start;
   scroll-snap-stop: always;
-}
-
-.site-main > .site-footer {
-  scroll-snap-align: end;
 }
 
 /* Narrow screens often make content taller than the viewport. Proximity keeps

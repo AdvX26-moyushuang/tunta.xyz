@@ -3,6 +3,7 @@
 import { animate, stagger } from 'animejs'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import logoUrl from '../assets/logo-3.png'
+import CtaGroup from '../components/CtaGroup.vue'
 import { pipelineStatePose } from '../config/mascot'
 import { useI18n } from '../composables/useI18n'
 import { usePrefersReducedMotion } from '../composables/usePrefersReducedMotion'
@@ -115,8 +116,14 @@ onMounted(() => {
         <p class="tagline reveal">{{ t.intro.tagline }}</p>
       </div>
     </div>
-    <p class="description reveal">{{ t.intro.description }}</p>
-    <p v-if="t.intro.note" class="note reveal">{{ t.intro.note }}</p>
+    <!-- Two text styles on this screen, no more: `.tagline` is the hook and
+         `.body` carries everything else. Rhythm comes from spacing, not from
+         another size/colour/alignment variant. -->
+    <p class="body reveal">{{ t.intro.audience }}</p>
+    <p class="body reveal">{{ t.intro.description }}</p>
+    <p v-if="t.intro.note" class="body reveal">{{ t.intro.note }}</p>
+    <CtaGroup class="ctas reveal" :items="t.intro.ctas" :aria-label="t.intro.tagline" />
+    <p class="body reveal">{{ t.intro.statusNote }}</p>
   </section>
 </template>
 
@@ -141,7 +148,9 @@ onMounted(() => {
 .mascot-slot {
   flex: none;
   position: relative;
-  width: clamp(128px, 20vmin, 184px);
+  /* vw-driven so the hero keeps scaling on a large desktop; vmin capped out
+     early and left the otter looking like a thumbnail at 1728px. */
+  width: clamp(132px, 16vw, 300px);
   aspect-ratio: 1;
   padding: 0;
   border: 0;
@@ -192,7 +201,7 @@ onMounted(() => {
 .brand-title {
   position: relative;
   flex: none;
-  width: clamp(9rem, 24vw, 17rem);
+  width: clamp(9rem, 26vw, 27rem);
   aspect-ratio: 1763 / 1098;
   overflow: hidden;
 }
@@ -216,19 +225,19 @@ onMounted(() => {
   text-align: center;
 }
 
-.description {
-  font-size: 1.05rem;
-  width: min(100%, 60ch);
+/* The only other text style on this screen. Audience, description, the
+   local-first line and the status note all share it. */
+.body {
+  font-size: var(--font-body);
+  color: var(--color-text-secondary);
+  width: min(100%, 58ch);
   margin-inline: auto;
   text-align: left;
+  text-wrap: pretty;
 }
 
-.note {
-  font-size: 0.9rem;
-  color: var(--color-text-muted);
-  width: min(100%, 48ch);
-  margin-inline: auto;
-  text-align: left;
+.ctas {
+  justify-content: center;
 }
 
 </style>

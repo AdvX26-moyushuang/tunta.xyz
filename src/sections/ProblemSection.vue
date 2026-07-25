@@ -55,7 +55,7 @@ h2 {
 }
 
 .body {
-  font-size: 1.02rem;
+  font-size: var(--font-body);
   width: 100%;
   text-align: left;
 }

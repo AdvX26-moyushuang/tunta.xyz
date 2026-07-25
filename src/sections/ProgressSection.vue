@@ -34,6 +34,8 @@ useRevealOnScroll(rootRef, { stagger: 110 })
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* Centre the stack; otherwise it clings to the top of a 100svh screen. */
+  justify-content: center;
   gap: var(--space-lg);
 }
 
@@ -43,19 +45,25 @@ h2 {
   text-align: center;
 }
 
+/* This screen carries the least content in the deck, so the prose runs a
+   little larger and wider — otherwise it reads as a caption stranded under an
+   oversized headline. */
 .body {
-  font-size: 1.02rem;
-  width: min(100%, 60ch);
+  font-size: clamp(1.05rem, 0.35vw + 0.94rem, 1.32rem);
+  line-height: 1.75;
+  width: min(100%, 66ch);
   text-align: left;
 }
 
 .status-line {
-  font-size: 0.9rem;
-  color: var(--color-text-muted);
-  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-body);
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  padding: var(--space-lg) var(--space-xl);
+  border-left: 3px solid var(--color-primary);
   border-radius: var(--border-radius);
-  background: color-mix(in srgb, var(--brand-nebula) 30%, transparent);
-  width: min(100%, 52ch);
+  background: color-mix(in srgb, var(--brand-nebula) 34%, transparent);
+  width: min(100%, 66ch);
   margin-inline: auto;
   text-align: left;
 }
