@@ -84,15 +84,21 @@ function renderItem(item: TrackedItem): void {
   const el = itemEls.get(item.spec.id)
   if (!el) return
   const { state, spec } = item
+  const values = [state.x, state.y, state.angle, state.scale, state.opacity]
+  if (!values.every(Number.isFinite)) {
+    throw new Error(
+      `[HeroPlayground] Item ${spec.id} received a non-finite visual state: ${JSON.stringify(state)}`,
+    )
+  }
   el.style.transform = `translate3d(${state.x - spec.w / 2}px, ${state.y - spec.h / 2}px, 0) rotate(${state.angle}rad) scale(${state.scale})`
   el.style.opacity = String(state.opacity)
+  el.style.visibility = 'visible'
 }
 
 function itemStyle(spec: PlaygroundItemSpec): Record<string, string> {
   const style: Record<string, string> = {
     width: `${spec.w}px`,
     height: `${spec.h}px`,
-    transform: 'translate3d(-9999px, -9999px, 0)',
   }
   if (spec.kind === 'box') {
     style.background = spec.color ?? '#f6c177'
@@ -422,6 +428,7 @@ onBeforeUnmount(() => {
   position: absolute;
   top: 0;
   left: 0;
+  visibility: hidden;
   user-select: none;
   touch-action: none;
   cursor: grab;

@@ -75,6 +75,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
 }
 
 body {
@@ -91,6 +92,37 @@ body {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
+}
+
+/* The landing page reads as a vertical deck. Native scroll snap keeps trackpad
+   and touch momentum interruptible while each screen settles into place. */
+.site-main > section {
+  min-height: 100svh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.site-main > .site-footer {
+  scroll-snap-align: end;
+}
+
+/* Narrow screens often make content taller than the viewport. Proximity keeps
+   their interior freely scrollable while still helping the next screen land. */
+@media (max-width: 720px), (max-height: 520px) {
+  html {
+    scroll-snap-type: y proximity;
+  }
+
+  .site-main > section {
+    scroll-snap-stop: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+    scroll-snap-type: none;
+  }
 }
 
 img {
