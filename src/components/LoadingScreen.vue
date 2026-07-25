@@ -1,8 +1,8 @@
 <script setup lang="ts">
-// Tunta Expo — Loading screen: mascot intro + asset preloading + progress bar
-import { animate, createTimeline, stagger } from 'animejs'
+// Tunta Expo — Loading screen: brand intro + asset preloading + progress wave
+import { animate, createTimeline } from 'animejs'
 import { computed, onMounted, ref, watch } from 'vue'
-import logoUrl from '../assets/logo3.png'
+import logoBigUrl from '../assets/logo-big.png'
 import { introPose } from '../config/mascot'
 import photoArticle from '../assets/photo-article.png'
 import photoLink from '../assets/photo-link.png'
@@ -20,11 +20,10 @@ const { prefersReducedMotion } = usePrefersReducedMotion()
 
 const rootRef = ref<HTMLElement>()
 const contentRef = ref<HTMLElement>()
-const mascotRef = ref<HTMLElement>()
+const logoFrameRef = ref<HTMLElement>()
 
 const progress = ref(0)
 const percent = computed(() => Math.round(progress.value * 100))
-const letters = computed(() => [...t.value.loading.title])
 
 // Every pose the entry sequence swaps to is preloaded here — the absorb
 // beats change `src` instantly, and an unfetched image would flash empty.
@@ -34,12 +33,11 @@ const PRELOAD_URLS = [
   photoVideo,
   photoArticle,
   photoLink,
-  introPose.loading,
   introPose.idle,
   introPose.absorbing,
   introPose.fed,
   introPose.flying,
-  logoUrl,
+  logoBigUrl,
 ]
 // `?debug-loading` slows the intro down, handy for demos and visual QA.
 const DEBUG_SLOW =
@@ -89,34 +87,16 @@ function leave(): void {
 }
 
 onMounted(() => {
-  const mascot = mascotRef.value
-  const root = rootRef.value
+  const logoFrame = logoFrameRef.value
 
   if (!prefersReducedMotion.value) {
-    // Entrance: letters pop in one by one, mascot drops in with a bounce.
-    if (root) {
-      animate(root.querySelectorAll('.loading-letter'), {
-        y: [26, 0],
+    if (logoFrame) {
+      animate(logoFrame, {
+        y: [18, 0],
         opacity: [0, 1],
-        delay: stagger(55),
-        duration: 560,
-        ease: 'outQuart',
-      })
-    }
-    if (mascot) {
-      animate(mascot, {
-        scale: [0, 1],
+        scale: [0.94, 1],
         duration: 620,
-        ease: 'outBack(1.8)',
-        onComplete: () => {
-          animate(mascot, {
-            y: [0, -12],
-            duration: 620,
-            ease: 'inOutSine',
-            loop: true,
-            alternate: true,
-          })
-        },
+        ease: 'outQuart',
       })
     }
   }
@@ -148,19 +128,30 @@ watch(progress, (value) => {
 <template>
   <div ref="rootRef" class="loading-screen" role="status" aria-live="polite">
     <div ref="contentRef" class="loading-content">
-      <img
-        ref="mascotRef"
-        class="loading-mascot"
-        :src="introPose.loading"
-        :alt="t.hero.mascotAlt"
-        draggable="false"
-      />
-      <h1 class="loading-title" aria-label="Tunta">
-        <span v-for="(letter, i) in letters" :key="i" class="loading-letter">{{ letter === ' ' ? ' ' : letter }}</span>
-      </h1>
+      <div ref="logoFrameRef" class="loading-logo-frame">
+        <img class="loading-logo" :src="logoBigUrl" :alt="t.loading.title" draggable="false" />
+      </div>
       <p class="loading-hint">{{ t.loading.hint }}<span class="loading-dots" aria-hidden="true"></span></p>
-      <div class="loading-track">
-        <div class="loading-fill" :style="{ width: percent + '%' }"></div>
+      <div
+        class="loading-wave"
+        role="progressbar"
+        :aria-label="t.loading.hint"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        :aria-valuenow="percent"
+      >
+        <svg viewBox="0 0 320 48" preserveAspectRatio="none" aria-hidden="true">
+          <path
+            class="loading-wave-track"
+            d="M0 24 C13.33 8 26.67 8 40 24 S66.67 40 80 24 S106.67 8 120 24 S146.67 40 160 24 S186.67 8 200 24 S226.67 40 240 24 S266.67 8 280 24 S306.67 40 320 24"
+          />
+          <path
+            class="loading-wave-progress"
+            pathLength="100"
+            :style="{ strokeDashoffset: 100 - percent }"
+            d="M0 24 C13.33 8 26.67 8 40 24 S66.67 40 80 24 S106.67 8 120 24 S146.67 40 160 24 S186.67 8 200 24 S226.67 40 240 24 S266.67 8 280 24 S306.67 40 320 24"
+          />
+        </svg>
       </div>
       <p class="loading-percent">{{ percent }}%</p>
     </div>
@@ -190,23 +181,23 @@ watch(progress, (value) => {
   padding: var(--space-xl);
 }
 
-.loading-mascot {
-  width: clamp(120px, 22vmin, 180px);
-  height: auto;
-  filter: drop-shadow(0 14px 22px rgb(74 50 38 / 0.22));
+.loading-logo-frame {
+  position: relative;
+  width: clamp(18rem, 52vw, 31rem);
+  aspect-ratio: 1699 / 720;
+  overflow: hidden;
+  filter: drop-shadow(0 14px 22px rgb(74 50 38 / 0.18));
 }
 
-.loading-title {
-  display: flex;
-  gap: 0.08em;
-  font-size: clamp(1.9rem, 5vw, 2.8rem);
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  color: #4a3226;
-}
-
-.loading-letter {
-  display: inline-block;
+/* logo-big.png has a square transparent canvas. These values map its measured
+   alpha bounds (x 193, y 565, 1699 × 720) exactly into the frame. */
+.loading-logo {
+  position: absolute;
+  left: -11.36%;
+  top: -78.47%;
+  width: 120.54%;
+  height: 284.44%;
+  max-width: none;
 }
 
 .loading-hint {
@@ -231,20 +222,35 @@ watch(progress, (value) => {
   75%, 100% { content: '...'; }
 }
 
-.loading-track {
+.loading-wave {
   width: min(320px, 64vw);
-  height: 12px;
-  border-radius: 999px;
-  background: rgb(74 50 38 / 0.12);
-  overflow: hidden;
-  box-shadow: inset 0 1px 2px rgb(74 50 38 / 0.12);
+  height: 48px;
 }
 
-.loading-fill {
+.loading-wave svg {
+  display: block;
+  width: 100%;
   height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #f2a65a, #e98b4e 45%, #7ec8c9);
-  transition: width 180ms ease-out;
+  overflow: visible;
+}
+
+.loading-wave-track,
+.loading-wave-progress {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 14;
+  vector-effect: non-scaling-stroke;
+}
+
+.loading-wave-track {
+  stroke: color-mix(in srgb, var(--color-accent) 34%, transparent);
+}
+
+.loading-wave-progress {
+  stroke: var(--color-accent);
+  stroke-dasharray: 100;
+  transition: stroke-dashoffset 180ms ease-out;
+  filter: drop-shadow(0 4px 8px color-mix(in srgb, var(--color-accent) 48%, transparent));
 }
 
 .loading-percent {

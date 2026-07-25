@@ -2,7 +2,7 @@
 // Tunta Expo — Intro section: product title with the mascot landing slot.
 import { animate, stagger } from 'animejs'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import logoUrl from '../assets/logo3.png'
+import logoUrl from '../assets/logo-3.png'
 import { pipelineStatePose } from '../config/mascot'
 import { useI18n } from '../composables/useI18n'
 import { usePrefersReducedMotion } from '../composables/usePrefersReducedMotion'
@@ -192,20 +192,20 @@ onMounted(() => {
 .brand-title {
   position: relative;
   flex: none;
-  width: clamp(10.5rem, 29vw, 20rem);
-  aspect-ratio: 3414 / 2410;
+  width: clamp(9rem, 24vw, 17rem);
+  aspect-ratio: 1763 / 1098;
   overflow: hidden;
 }
 
-/* logo3.png is a square source file with a transparent presentation canvas.
-   These values map its alpha bounds (x 632, y 940, 3414 × 2410) onto this
-   viewport without modifying or stretching the brand artwork. */
+/* logo-3.png is a 2048 × 2048 source file with a transparent presentation
+   canvas. These values map its alpha bounds (x 198, y 493, 1763 × 1098) onto
+   this viewport without modifying or stretching the brand artwork. */
 .brand-title img {
   position: absolute;
-  left: -18.51%;
-  top: -39%;
-  width: 127.47%;
-  height: 180.58%;
+  left: -11.23%;
+  top: -44.9%;
+  width: 116.17%;
+  height: 186.52%;
   max-width: none;
 }
 

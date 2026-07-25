@@ -92,6 +92,7 @@ const { t } = useI18n()
 .brand-avatar img {
   width: 100%;
   height: 100%;
+  padding-right: 3px;
   object-fit: contain;
   transform: scale(2.15) translateY(19%);
 }
