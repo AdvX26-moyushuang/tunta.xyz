@@ -101,9 +101,9 @@ export function createPhysicsPlayground(options: PhysicsPlaygroundOptions): Phys
   engine.gravity.y = 1
 
   const items: TrackedItem[] = specs.map((spec) => {
-    const state: ItemVisualState = { x: -9999, y: -9999, angle: 0, scale: 1, opacity: 1 }
+    const state: ItemVisualState = { x: 0, y: 0, angle: 0, scale: 1, opacity: 1 }
     // Placeholder body, replaced with a properly spawned one in start().
-    const body = Matter.Bodies.rectangle(-9999, -9999, spec.w, spec.h)
+    const body = Matter.Bodies.rectangle(0, 0, spec.w, spec.h)
     return { spec, state, body }
   })
 
@@ -152,6 +152,10 @@ export function createPhysicsPlayground(options: PhysicsPlaygroundOptions): Phys
     const bodies: Matter.Body[] = []
     items.forEach((item, index) => {
       item.body = createBody(item.spec, rand(w * 0.1, w * 0.9), -80 - index * rand(56, 96))
+      item.state.x = item.body.position.x
+      item.state.y = item.body.position.y
+      item.state.angle = item.body.angle
+      onRender(item)
       bodies.push(item.body)
     })
     Matter.Composite.add(world, bodies)
@@ -169,9 +173,17 @@ export function createPhysicsPlayground(options: PhysicsPlaygroundOptions): Phys
         w - spec.w / 2 - 8,
       )
       const y = -60 - index * rand(48, 88)
-      const state: ItemVisualState = { x, y, angle: 0, scale: 1, opacity: 1 }
       const body = createBody(spec, x, y)
-      items.push({ spec, state, body })
+      const state: ItemVisualState = {
+        x: body.position.x,
+        y: body.position.y,
+        angle: body.angle,
+        scale: 1,
+        opacity: 1,
+      }
+      const item = { spec, state, body }
+      items.push(item)
+      onRender(item)
       bodies.push(body)
     })
     Matter.Composite.add(world, bodies)
