@@ -3,7 +3,9 @@ import type { SiteContent } from '../types'
 
 /** Public project links. */
 export const links = {
-  repo: 'https://github.com/AdvX26-moyushuang/Tunta',
+  repo: 'https://github.com/AdvX26-moyushuang/Tunta-extension',
+  /** Latest packaged build (.crx) — the download page, not a direct file URL. */
+  releases: 'https://github.com/AdvX26-moyushuang/Tunta-extension/releases/latest',
 } as const
 
 export const content: SiteContent = {
@@ -30,7 +32,7 @@ export const content: SiteContent = {
     // 屏 1 · Hero — 给谁、解决什么、结果是什么，外加一个符合阶段的 CTA
     intro: {
       title: 'Tunta 屯獭',
-      tagline: '收藏不难，找回来才难。',
+      tagline: '让积灰的收藏重新可用',
       audience: '写给收藏夹里躺着几百条网页和视频、记得内容讲了什么、却想不起标题和作者的人。',
       description:
         'Tunta 把你主动存下的网页、B 站视频和小红书笔记，转成可以用一句话问回来的卡片。你描述那件事，它把你带回原文的那一段、那一秒。',
@@ -262,7 +264,8 @@ export const content: SiteContent = {
       body: 'Tunta 还没上架，但那条闭环已经能自己跑一遍了——收藏、生成卡片、用一句话问回来、点开验原文。愿意折腾的话，现在就能装上试。',
       ctas: [
         { label: '看一次真实取回', href: '#retrieval', variant: 'primary' },
-        { label: '去 GitHub 自己 build', href: links.repo, variant: 'secondary', external: true },
+        { label: '下载最新插件包', href: links.releases, variant: 'secondary', external: true },
+        { label: '去 GitHub 自己 build', href: links.repo, variant: 'ghost', external: true },
       ],
       note: '开源。没有等待名单，不收邮箱，不需要注册账号。',
     },
